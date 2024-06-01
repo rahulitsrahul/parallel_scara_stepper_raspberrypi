@@ -80,6 +80,7 @@ class actuator_stepper(object):
             mtr_id=1, step_pin=step_pin_1, ena_pin=ena_pin_1, dir_pin=dir_pin_1
         )
 
+        # Update self.motors list as per the number of stepper motors used
         self.motors = [self.Mtr_0, self.Mtr_1]
 
         self.move_steppers_flag = False
@@ -96,8 +97,7 @@ class actuator_stepper(object):
                 self.stepper_time_delay = target_steps_dict["stpr_delay"]
 
                 if not target_steps[0] in ["START", "END"]:
-                    #                print("targ stps: ", target_steps)
-                    #        t1 = time.time()
+                    # t1 = time.time()
                     Motor.is_running = True
                     steps_to_move = []
                     for motor, target_step in zip(self.motors, target_steps):
@@ -122,9 +122,8 @@ class actuator_stepper(object):
                         motor.R = R
                         motor.R_temp = R
 
-                    #        print("elapsed_:  ", round(((time.time()-t1)/1e-6), 2), " us")
+                    # print("elapsed_:  ", round(((time.time()-t1)/1e-6), 2), " us")
                     self.move_stpr(self.motors)
-                #        print("target: ", target_steps)
                 else:
                     self.move_steppers_flag = (
                         True if target_steps[0] == "START" else False

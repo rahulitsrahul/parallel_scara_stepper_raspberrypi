@@ -31,7 +31,7 @@ class robot(object):
             print("POS: ", motor.current_pos)
 
         # Move the stepper motor to 90 deg and set the current step position as [0, 0]
-        self.steps_to_move_queue.put({"steps_to_move": [0, 0], "stpr_delay": 1000e-6})
+        self.steps_to_move_queue.put({"steps_to_move": [0]*len(self.actuator.motors), "stpr_delay": 1000e-6})
 
         """
         Get the angles for the position x=0, y=186.6 and set them as initial actuator theta angles.
@@ -101,7 +101,7 @@ class robot(object):
             target_position[1],
         )
         stpr_delay_segments = self.get_stpr_delay_segments(linear_segments, delay_stpr)
-        linear_segments = [["START", "START"]] + linear_segments + [["END", "END"]]
+        linear_segments = [["START"]*len(self.actuator.motors)] + linear_segments + [["END"]*len(self.actuator.motors)]
         stpr_delay_segments = [None] + stpr_delay_segments + [None]
 
         for xy_points, stpr_delay in zip(linear_segments, stpr_delay_segments):
