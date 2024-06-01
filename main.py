@@ -1,105 +1,51 @@
-from scara_kinematics import *
-from actuator_stepper import *
-from robot import *
 import time
 
+from actuator_stepper import *
+from robot import *
+from scara_kinematics import *
 
 if __name__ == "__main__":
-    
+
     print("STARTED")
     # Initiate the elements of the Robot (Actuators, kinematics and robot_control)
     actuator = actuator_stepper()
     print("stepper_initiated")
-    scara_kin = scara_kinematics(L0=50, L1=100, L2=100)
+    scara_kin = scara_kinematics(L0=29, L1=120, L2=120)
     print("scara_kinematics_initiated")
     robo = robot(actuator, scara_kin)
     print("Robot_Initiated")
-    
+
     time.sleep(2)
     """
     At this Point robot would be initiated and positioned using limit switches
     For local setup to initiate this, set the stepper motor pointer manually.
     press y to continue
     """
-    print("reprap start")
-    for i in range(50):
-        robo.move_robot(90, 130)
-        time.sleep(0.15)
-        robo.move_robot(-90, 130)
-        time.sleep(0.15)
-#    while True:
-#        start = str(input("Press y if links are initiated: "))
-#        if start == 'y':
-#            break
-#        else:
-#            print("invalid input please provide proper input")
+    while True:
+        start = str(input("Press y if links are initiated: "))
+        if start == "y":
+            break
+        else:
+            print("invalid input please provide proper input")
 
-#    # Move the robot to position (x, y)
-#    print("Move robot to 50, 130")
-#    robo.move_robot_direct(90, 130)
-##    while robo.is_moving():
-##        pass
-#    
-#    robo.move_robot_direct(0, 130)
-##    while robo.is_moving():
-##        pass
-#    time.sleep(2)
-#    
-#    for i in range(10):
-#        print("reprap in motion", f"{i} / {10}")
-#        # Move the robot horizontal between (-50, 130) and (+50, 130) with the resolution of 2 units
-#        x_val = list(range(-90, 90, 1))
-#        y_val = [130]*len(x_val)
-#
-#        for x,y in zip(x_val, y_val):
-##             while robo.is_moving():
-##                 pass
-##             print(f"move robot x:{x} , y:{y}")
-#             robo.move_robot_direct(x, y)
-#
-#        x_val = list(range(90, -90, -1))
-#        y_val = [130]*len(x_val)
-#
-#        for x,y in zip(x_val, y_val):
-#            
-##             while robo.is_moving():
-##                 pass
-##             print(f"move robot x:{x} , y:{y}")
-#             robo.move_robot_direct(x, y)
-#            
-##        time.sleep(2)
-#        print("done")
-#        
-#    # Run mtoors with user input of x direction
-#    while True:
-#        robo.move_robot_direct(0, 130)
-#        runs = int(input("Enter num repetations: "))
-#        for i in range(runs):
-#            print("reprap in motion", f"{i} / {runs}")
-#            # Move the robot horizontal between (-50, 130) and (+50, 130) with the resolution of 2 units
-#            x_val = list(range(-90, 90, 1))
-#            y_val = [130]*len(x_val)
-#    
-#            for x,y in zip(x_val, y_val):
-#    #             while robo.is_moving():
-#    #                 pass
-#    #             print(f"move robot x:{x} , y:{y}")
-#                 robo.move_robot_direct(x, y)
-#    
-#            x_val = list(range(90, -90, -1))
-#            y_val = [130]*len(x_val)
-#    
-#            for x,y in zip(x_val, y_val):
-#                
-#    #             while robo.is_moving():
-#    #                 pass
-#    #             print(f"move robot x:{x} , y:{y}")
-#                 robo.move_robot_direct(x, y)
-#                
-#    #        time.sleep(2)
-#            print("done")
-        
-        
+    print("reprap start")
+    for i in range(20):
+        robo.move_robot(x=90, y=130, delay_stpr=100)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+
+        robo.move_robot(90, 180, delay_stpr=100)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+
+        robo.move_robot(x=-90, y=180, delay_stpr=100)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+
+        robo.move_robot(-90, 130, delay_stpr=100)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+
 
 """
 robo.move_robot(-90, 130)
@@ -107,6 +53,4 @@ robo.move_robot(90, 130)
 robo.move_robot(-90, 130)
 robo.move_robot(90, 130)
 robo.move_robot(0, 130)
-
 """
-    
