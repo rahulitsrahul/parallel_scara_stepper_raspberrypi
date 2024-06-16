@@ -13,7 +13,7 @@ class scara_kinematics(object):
         self.init_theta_a1 = 0
         self.init_theta_a2 = 0
 
-        self.steps_per_rev = 200 * 8
+        self.steps_per_rev = 200 * 8  * 1 # steps per rev * scalar * gear ratio
         self.steps_per_deg = self.steps_per_rev / 360
 
     def get_link_angles(self, x, y):

@@ -24,6 +24,10 @@ class robot(object):
         self.initiate_actuators(x=0, y=236)
         print("Initiating ROBOT")
         self.current_pos_xy = [0, 236]
+        
+        # Set Acceleration/Deceleration Parameters
+        self.init_accel_value = 5000
+        self.accel_scale_factor = 1.02
 
     def initiate_actuators(self, x, y):
         # Here, essentially the robot links hit the limit switches and move to the zero positions of the actuators
@@ -52,6 +56,7 @@ class robot(object):
         self.current_pos_xy = [0, 130]
 
     def bresenham_line(self, x0, y0, x1, y1):
+        print("pts: ", x0, y0, x1, y1)
         points = []
         dx = abs(x1 - x0)
         dy = abs(y1 - y0)
@@ -74,15 +79,15 @@ class robot(object):
 
         return points
 
-    def get_stpr_delay_segments(self, linear_segments, delay_stpr=100):
+    def get_stpr_delay_segments(self, linear_segments, delay_stpr=10):
         stpr_delay_segs = np.ones(len(linear_segments)) * np.inf
 
-        stpr_delay_segs[0] = 2000
+        stpr_delay_segs[0] = self.init_accel_value
         stpr_delay_segs[-1] = stpr_delay_segs[0]
         for i in range(1, int(np.floor(len(stpr_delay_segs)) / 2)):
             stpr_delay_segs[i] = max(
                 delay_stpr,
-                stpr_delay_segs[0] * (math.sqrt(i + 1) - math.sqrt(1.02 * i)),
+                stpr_delay_segs[0] * (math.sqrt(i + 1) - math.sqrt(self.accel_scale_factor * i)),
             )
             stpr_delay_segs[-i - 1] = stpr_delay_segs[i]
         stpr_delay_segs = np.where(
@@ -91,7 +96,7 @@ class robot(object):
 
         return list(stpr_delay_segs * 1e-6)
 
-    def move_robot(self, x, y, delay_stpr=100):
+    def move_robot(self, x, y, delay_stpr=10):
 
         target_position = [x, y]
         linear_segments = self.bresenham_line(
@@ -116,7 +121,7 @@ class robot(object):
             self.steps_to_move_queue.put(
                 {"steps_to_move": steps_to_move, "stpr_delay": stpr_delay}
             )
-            time.sleep(150e-6)
+            time.sleep(5e-6)
         self.current_pos_xy = target_position
 
     def move_robot_direct(self, x, y):
@@ -124,7 +129,7 @@ class robot(object):
         steps_to_move = self.kinematics.get_steps_for_pos(x, y)
 
         # Move the actuators to reach the steps computed
-        time.sleep(150e-6)
+        time.sleep(5e-6)
         self.steps_to_move_queue.put(
-            {"steps_to_move": steps_to_move, "stpr_delay": 100e-6}
+            {"steps_to_move": steps_to_move, "stpr_delay": 5e-6}
         )

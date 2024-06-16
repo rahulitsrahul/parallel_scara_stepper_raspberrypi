@@ -29,22 +29,32 @@ if __name__ == "__main__":
             print("invalid input please provide proper input")
 
     print("reprap start")
-    for i in range(20):
-        robo.move_robot(x=90, y=130, delay_stpr=100)
+    
+    robo.init_accel_value = 2000
+    robo.accel_scale_factor = 1.005
+    num_reps = 20
+    for i in range(num_reps):
+        print(f"----------STEP {i+1}/{num_reps}--------------")
+        print("moving, 90, 130")
+        robo.move_robot(x=90, y=130, delay_stpr=50)
         while robo.actuator.move_steppers_flag:
             time.sleep(0.02)
+        time.sleep(0.2)
+        print("moving 90 , 180")
+        robo.move_robot(90, 180, delay_stpr=50)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+        time.sleep(0.2)
 
-        robo.move_robot(90, 180, delay_stpr=100)
-        while robo.actuator.move_steppers_flag:
-            time.sleep(0.02)
+#        robo.move_robot(x=-90, y=180, delay_stpr=100)
+#        while robo.actuator.move_steppers_flag:
+#            time.sleep(0.02)
+#        time.sleep(0.2)
 
-        robo.move_robot(x=-90, y=180, delay_stpr=100)
+        robo.move_robot(-90, 130, delay_stpr=50)
         while robo.actuator.move_steppers_flag:
             time.sleep(0.02)
-
-        robo.move_robot(-90, 130, delay_stpr=100)
-        while robo.actuator.move_steppers_flag:
-            time.sleep(0.02)
+        time.sleep(0.2)
 
 
 """
