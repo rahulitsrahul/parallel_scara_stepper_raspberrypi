@@ -9,6 +9,7 @@ from actuator_stepper import *
 
 class limit_switches(object):
     def __init__(self):
+        print('Initialized limit switches')
         self.lim_sw_pin_left = 35
         self.lim_sw_pin_right = 37
         

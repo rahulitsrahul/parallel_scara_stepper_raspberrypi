@@ -4,6 +4,7 @@ import threading
 import time
 
 import numpy as np
+from limit_sw_initialize import *
 
 
 class robot(object):
@@ -16,44 +17,30 @@ class robot(object):
         when both the links are vertical (90 deg), the x, y positions are [0, 186.6] for L0=50, L1=100, L2= 100
         This may vary for actual robot limit switch positions
         """
+        
+        print("Initiating ROBOT")
+        self.initiate_actuators()
+        self.current_pos_xy = [0, 147]
+        
+        # Set init thetas as same as current pos
+        x, y = self.current_pos_xy
+        self.kinematics.init_theta_a1, self.kinematics.init_theta_a2 = self.kinematics.get_link_angles(x, y)
+        
+        # Initialize Queue
         self.steps_to_move_queue = queue.Queue()
         t1 = threading.Thread(
             target=self.actuator.set_target_steps, args=(self.steps_to_move_queue,)
         )
         t1.start()
-        self.initiate_actuators(x=0, y=145)
-        print("Initiating ROBOT")
-        self.current_pos_xy = [0, 145]
+        
         
         # Set Acceleration/Deceleration Parameters
         self.init_accel_value = 5000
         self.accel_scale_factor = 1.02
 
-    def initiate_actuators(self, x, y):
-        # Here, essentially the robot links hit the limit switches and move to the zero positions of the actuators
-        for motor in self.actuator.motors:
-            print("POS: ", motor.current_pos)
-
-        # Move the stepper motor to 90 deg and set the current step position as [0, 0]
-        self.steps_to_move_queue.put({"steps_to_move": [0]*len(self.actuator.motors), "stpr_delay": 1000e-6})
-
-        """
-        Get the angles for the position x=0, y=186.6 and set them as initial actuator theta angles.
-        This corresponds to for the pos x=0, y=186.6, the stepper motor positions are 0, 0
-        """
-        link_angles = self.kinematics.get_link_angles(x=x, y=y)
-        print("angles for the position ", [x, y], ": ", link_angles)
-
-        self.kinematics.init_theta_a1 = link_angles[0]
-        self.kinematics.init_theta_a2 = link_angles[1]
-
-        for motor in self.actuator.motors:
-            motor.current_pos = 0
-
-        # Move the robot to 0, 130 for initialization
-        self.move_robot_direct(0, 130)
-        time.sleep(1)
-        self.current_pos_xy = [0, 130]
+    def initiate_actuators(self):
+        limit_sw_init = limit_switches()
+        limit_sw_init.initialize_actuators()
 
     def bresenham_line(self, x0, y0, x1, y1):
         print("pts: ", x0, y0, x1, y1)
