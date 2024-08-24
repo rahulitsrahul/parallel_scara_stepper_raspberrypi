@@ -17,7 +17,7 @@ class Motor(object):
     master_pulse = 0
     is_running = False
 
-    def __init__(self, mtr_id, step_pin, dir_pin, ena_pin, steps_per_rev=200 * 8  * 1): # steps per rev * scalar * gear ratio
+    def __init__(self, mtr_id, step_pin, dir_pin, ena_pin, steps_per_rev=200 * 32  * 1): # steps per rev * scalar * gear ratio
         self.step_pin = step_pin
         self.dir_pin = dir_pin
         self.ena_pin = ena_pin
@@ -141,6 +141,7 @@ class actuator_stepper(object):
             self.move_stpr()
 
         Motor.is_running = False
+        
 
 
 if __name__ == "__main__":

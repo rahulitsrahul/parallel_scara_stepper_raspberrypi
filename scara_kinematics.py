@@ -1,9 +1,10 @@
 import math as m
 import time
+import numpy as np
 
 
 class scara_kinematics(object):
-    def __init__(self, L0=29, L1=120, L2=120):
+    def __init__(self, L0=101, L1=60, L2=100):
         # L0, L1 and L2 are the link lengths
         self.L0 = L0
         self.L1 = L1
@@ -13,11 +14,11 @@ class scara_kinematics(object):
         self.init_theta_a1 = 0
         self.init_theta_a2 = 0
 
-        self.steps_per_rev = 200 * 8  * 1 # steps per rev * scalar * gear ratio
+        self.steps_per_rev = 200 * 32  * 1 # steps per rev * scalar * gear ratio
         self.steps_per_deg = self.steps_per_rev / 360
 
     def get_link_angles(self, x, y):
-        #        t1 = time.time()
+        # t1 = time.time()
 
         L0 = self.L0
         L1 = self.L1
@@ -63,8 +64,9 @@ class scara_kinematics(object):
 
         theta_a1 = m.degrees(beta_1 + gamma_1)
         theta_a2 = m.degrees(beta_2 - gamma_2)
-
-        #        print("elapsed_kinematics:  ", round(((time.time()-t1)/1e-6), 2), " us")
+        
+        # t2 = time.time()
+        # print("elapsed_kinematics:  ", round(((t2-t1)/1e-6), 2), " us")
 
         return [theta_a1, theta_a2]  # degrees
 
@@ -85,3 +87,16 @@ class scara_kinematics(object):
         # print("steps_a1: ", steps_a1)
 
         return [round(steps_a1), round(steps_a2)]
+
+if __name__=="__main__":
+    scara_kin = scara_kinematics()
+    time_el = []
+    n = 100
+    for _ in range(1000):
+        t1 = time.time()
+        th_1, th_2 = scara_kin.get_steps_for_pos(0, 145)
+        t2 = time.time()
+        print(f"Elapsed: {(t2-t1)*1e6}")
+        print(f"theta_1:{th_1}, theta_2:{th_2}")
+        time_el.append((t2-t1)*1e6)
+    print(f"---Mean time with {n} reps: {np.mean(time_el):.4f} us")

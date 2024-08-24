@@ -21,9 +21,9 @@ class robot(object):
             target=self.actuator.set_target_steps, args=(self.steps_to_move_queue,)
         )
         t1.start()
-        self.initiate_actuators(x=0, y=236)
+        self.initiate_actuators(x=0, y=145)
         print("Initiating ROBOT")
-        self.current_pos_xy = [0, 236]
+        self.current_pos_xy = [0, 145]
         
         # Set Acceleration/Deceleration Parameters
         self.init_accel_value = 5000

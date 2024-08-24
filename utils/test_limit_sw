@@ -1,0 +1,19 @@
+import RPi.GPIO as GPIO  # Import Raspberry Pi GPIO library
+
+GPIO.setmode(GPIO.BOARD)  # Import Raspberry Pi GPIO library
+GPIO.setwarnings(False)  # Ignore warning for now
+import time
+
+if __name__ == "__main__":
+    lim_sw_pin_left = 37
+    lim_sw_pin_right = 35
+    
+    GPIO.setup(lim_sw_pin_left, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    GPIO.setup(lim_sw_pin_right, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+    
+    while True:
+        lim_sw_left_val = GPIO.input(lim_sw_pin_left)
+        lim_sw_right_val = GPIO.input(lim_sw_pin_right)
+        
+        print(f"Left: {lim_sw_left_val}, Right: {lim_sw_right_val}")
+        time.sleep(0.01)
