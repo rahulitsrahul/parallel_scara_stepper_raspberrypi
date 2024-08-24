@@ -61,6 +61,20 @@ class Motor(object):
         GPIO.output(self.dir_pin, GPIO.HIGH) if np.sign(
             self.target_pos - self.current_pos
         ) >= 0 else GPIO.output(self.dir_pin, GPIO.LOW)
+    
+    # Functions used for initialization
+    def set_dir_ccw(self):
+        GPIO.output(self.dir_pin, GPIO.LOW)
+    
+    def set_dir_cw(self):
+        GPIO.output(self.dir_pin, GPIO.HIGH)
+    
+    def move_one_step(self, delay=5000e-6):
+        GPIO.output(self.step_pin, GPIO.HIGH)
+        time.sleep(delay)
+        GPIO.output(self.step_pin, GPIO.LOW)
+        time.sleep(delay)
+        
 
 
 class actuator_stepper(object):
