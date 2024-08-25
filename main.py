@@ -32,38 +32,48 @@ if __name__ == "__main__":
     robo.init_accel_value = 10000
     robo.accel_scale_factor = 1.005
     num_reps = 1
-    # for i in range(num_reps):
-    #     print(f"----------STEP {i+1}/{num_reps}--------------")
-    #     robo.move_robot(0, 100, delay_stpr=50)
-    #     while robo.actuator.move_steppers_flag:
-    #         time.sleep(0.02)
-    #     time.sleep(0.2)
+    for i in range(num_reps):
+        print(f"----------STEP {i+1}/{num_reps}--------------")
+        robo.move_robot_linear(0, 100, delay_stpr=50)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+        time.sleep(0.2)
         
-    #     robo.move_robot(30, 100, delay_stpr=50)
-    #     while robo.actuator.move_steppers_flag:
-    #         time.sleep(0.02)
-    #     time.sleep(0.2)
+        robo.move_robot_linear(30, 100, delay_stpr=50)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+        time.sleep(0.2)
         
-    #     robo.move_robot(30, 130, delay_stpr=50)
+        robo.move_robot_linear(30, 130, delay_stpr=50)
         
-    #     while robo.actuator.move_steppers_flag:
-    #         time.sleep(0.02)
-    #     time.sleep(0.2)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+        time.sleep(0.2)
         
-    #     robo.move_robot(-30, 130, delay_stpr=50)
-    #     while robo.actuator.move_steppers_flag:
-    #         time.sleep(0.02)
-    #     time.sleep(0.2)
+        robo.move_robot_linear(-30, 130, delay_stpr=50)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+        time.sleep(0.2)
         
-    #     robo.move_robot(-30, 100, delay_stpr=50)
-    #     while robo.actuator.move_steppers_flag:
-    #         time.sleep(0.02)
-    #     time.sleep(0.2)
+        robo.move_robot_linear(-30, 100, delay_stpr=50)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
+        time.sleep(0.2)
         
-    #     robo.move_robot(0, 100, delay_stpr=50)
-    #     while robo.actuator.move_steppers_flag:
-    #         time.sleep(0.02)
+        robo.move_robot_linear(0, 100, delay_stpr=50)
+        while robo.actuator.move_steppers_flag:
+            time.sleep(0.02)
 time.sleep(0.2)
+
+
+
+"""
+robo.move_robot_linear(0, 100, delay_stpr=50)
+while robo.actuator.move_steppers_flag:
+    time.sleep(0.02)
+
+robo.move_robot_circular(start=[0, 100], end=[0, 130], center=[0, 115], radius=15, direction='cw', delay_stpr=1000)
+"""
 
 
 """

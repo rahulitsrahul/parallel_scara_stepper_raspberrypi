@@ -45,6 +45,7 @@ class limit_switches(object):
         left_flag = False
         right_flag = False
         
+        # Touch limit switches - First time Coarse
         while True:
             lim_sw_vals = self.get_values()
             left_val = lim_sw_vals['left']
@@ -63,6 +64,44 @@ class limit_switches(object):
             if right_flag and left_flag:
                 break
             
+        # Move actuators
+        # Set motor direction to rotate away limit switches
+        self.actuator_left.set_dir_ccw()
+        self.actuator_right.set_dir_ccw()
+        
+        for _ in range(300):
+            self.actuator_left.move_one_step(1000e-6)
+            
+        for _ in range(300):
+            self.actuator_right.move_one_step(1000e-6)
+            
+        
+        # Set motor direction to rotate towards limit switches
+        self.actuator_left.set_dir_cw()
+        self.actuator_right.set_dir_cw()
+        
+        left_flag = False
+        right_flag = False
+        
+        # Touch limit switches - Second time Fine
+        while True:
+            lim_sw_vals = self.get_values()
+            left_val = lim_sw_vals['left']
+            right_val = lim_sw_vals['right']
+            
+            if left_val ==  0 and left_flag==False:
+                self.actuator_left.move_one_step(8000e-6)
+            else:
+                left_flag = True
+            
+            if right_val == 0 and right_flag==False:
+                self.actuator_right.move_one_step(8000e-6)
+            else:
+                right_flag = True
+            
+            if right_flag and left_flag:
+                break
+        
     
     def goto_home_pos(self):
         # Set motor direction to rotate away limit switches
