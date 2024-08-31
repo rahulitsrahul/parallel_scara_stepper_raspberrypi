@@ -79,57 +79,144 @@ class robot(object):
         return points
     
     
-    def circular_interpolation(self, start, end, center, radius, direction='cw'):
-        resolution = 0.1
-        """
-        Generates points along a circular arc with a specified resolution.
+    # def circular_interpolation(self, start, end, center, radius, direction='cw'):
+    #     resolution = 0.1
+    #     """
+    #     Generates points along a circular arc with a specified resolution.
 
-        Parameters:
-        - start: tuple of (x, y) for the start point of the arc.
-        - end: tuple of (x, y) for the end point of the arc.
-        - center: tuple of (cx, cy) for the center of the circle.
-        - radius: radius of the circle.
-        - direction: 'clockwise' or 'counterclockwise' for the direction of the arc.
-        - resolution: distance between consecutive points along the arc.
+    #     Parameters:
+    #     - start: tuple of (x, y) for the start point of the arc.
+    #     - end: tuple of (x, y) for the end point of the arc.
+    #     - center: tuple of (cx, cy) for the center of the circle.
+    #     - radius: radius of the circle.
+    #     - direction: 'clockwise' or 'counterclockwise' for the direction of the arc.
+    #     - resolution: distance between consecutive points along the arc.
 
-        Returns:
-        - List of (x, y) tuples representing points along the arc.
-        """
-        # Convert inputs to numpy arrays for ease of calculations
-        start = np.array(start)
-        end = np.array(end)
-        center = np.array(center)
+    #     Returns:
+    #     - List of (x, y) tuples representing points along the arc.
+    #     """
+    #     # Convert inputs to numpy arrays for ease of calculations
+    #     start = np.array(start)
+    #     end = np.array(end)
+    #     center = np.array(center)
 
-        # Compute angles
-        def angle_from_center(point):
-            return np.arctan2(point[1] - center[1], point[0] - center[0])
+    #     # Compute angles
+    #     def angle_from_center(point):
+    #         return np.arctan2(point[1] - center[1], point[0] - center[0])
 
-        start_angle = angle_from_center(start)
-        end_angle = angle_from_center(end)
+    #     start_angle = angle_from_center(start)
+    #     end_angle = angle_from_center(end)
 
-        # Ensure angles are within the range [0, 2*pi)
-        start_angle = start_angle % (2 * np.pi)
-        end_angle = end_angle % (2 * np.pi)
+    #     # Ensure angles are within the range [0, 2*pi)
+    #     start_angle = start_angle % (2 * np.pi)
+    #     end_angle = end_angle % (2 * np.pi)
 
-        # Compute angular difference
-        angular_range = end_angle - start_angle
+    #     # Compute angular difference
+    #     angular_range = end_angle - start_angle
 
-        # Adjust angular_range for correct direction
-        if direction == 'cw':
-            if angular_range < 0:
-                angular_range += 2 * np.pi
+    #     # Adjust angular_range for correct direction
+    #     if direction == 'cw':
+    #         if angular_range < 0:
+    #             angular_range += 2 * np.pi
+    #     else:
+    #         if angular_range > 0:
+    #             angular_range -= 2 * np.pi
+
+    #     # Calculate the number of points required
+    #     arc_length = abs(angular_range) * radius
+    #     num_points = int(np.ceil(arc_length / resolution))
+
+    #     # Generate points
+    #     angles = np.linspace(start_angle, start_angle + angular_range, num_points)
+    #     points = [(center[0] + radius * np.cos(angle), center[1] + radius * np.sin(angle)) for angle in angles]
+
+    #     return points
+    
+    def circular_interpolation(self, command, x, y, i, j, r):
+        # Start point of circle
+        start_x, start_y = self.current_pos_xy
+        # print(f"params: startx: {start_x}, start_y: {start_y}, cmd:{command}, x:{x}, y:{y}, i:{i}, j:{j}, r:{r}")
+        full_circle_flag = False
+        resolution=0.1
+    
+        if r is not None:
+            # Calculate the distance between start and end points
+            dx = x - start_x
+            dy = y - start_y
+            d = math.sqrt(dx**2 + dy**2)
+    
+            if d > 2 * abs(r):
+                raise ValueError("Distance between start and end points is greater than the diameter of the circle")
+    
+            # Calculate the midpoint
+            mx, my = (start_x + x) / 2, (start_y + y) / 2
+    
+            # Calculate the distance from the midpoint to the center of the circle
+            h = math.sqrt(r**2 - (d/2)**2)
+    
+            if command == 'G03':  # Clockwise
+                xc = mx + h * dy / d
+                yc = my - h * dx / d
+            elif command == 'G02':  # Counterclockwise
+                xc = mx - h * dy / d
+                yc = my + h * dx / d
+    
+            radius = r
         else:
-            if angular_range > 0:
-                angular_range -= 2 * np.pi
-
-        # Calculate the number of points required
-        arc_length = abs(angular_range) * radius
-        num_points = int(np.ceil(arc_length / resolution))
-
-        # Generate points
-        angles = np.linspace(start_angle, start_angle + angular_range, num_points)
-        points = [(center[0] + radius * np.cos(angle), center[1] + radius * np.sin(angle)) for angle in angles]
-
+            if i == 0 and j == 0:
+                # When I and J are both zero, assume full circle
+                radius = math.sqrt((x - start_x)**2 + (y - start_y)**2) / 2
+                xc = (start_x + x) / 2
+                yc = (start_y + y) / 2
+                full_circle_flag = True
+            else:
+                xc = start_x + i
+                yc = start_y + j
+                radius = math.sqrt(i**2 + j**2)
+                full_circle_flag = False
+    
+        if radius <= 0:
+            raise ValueError("Radius must be positive and non-zero")
+    
+        # Calculate start and end angles
+        start_angle = math.atan2(start_y - yc, start_x - xc)
+        end_angle = math.atan2(y - yc, x - xc)
+    
+        if full_circle_flag:
+            # Ensure a full circle is made
+            if command == 'G03':  # Clockwise
+                end_angle = start_angle - 2 * math.pi
+            elif command == 'G02':  # Counterclockwise
+                end_angle = start_angle + 2 * math.pi
+        else:
+            # Adjust the end angle based on the direction
+            if command == 'G03':  # Clockwise
+                if end_angle > start_angle:
+                    end_angle -= 2 * math.pi
+            elif command == 'G02':  # Counterclockwise
+                if end_angle < start_angle:
+                    end_angle += 2 * math.pi
+    
+        # Calculate the angular difference
+        angular_difference = end_angle - start_angle
+    
+        # Ensure the number of points is at least one
+        if resolution <= 0:
+            raise ValueError("Resolution must be positive and non-zero")
+        num_points = max(int(abs(angular_difference) / (resolution / radius)), 20)
+    
+        # Generate the points along the arc
+        points = []
+        for i in range(num_points + 1):
+            angle = start_angle + i * angular_difference / num_points
+            px = xc + radius * math.cos(angle)
+            py = yc + radius * math.sin(angle)
+            points.append([px, py])
+    
+        # Ensure the last point is exactly the end point, if not a full circle
+        if not full_circle_flag:
+            points[-1] = [x, y]
+    
         return points
 
     def get_stpr_delay_segments(self, linear_segments, delay_stpr=10):
@@ -177,17 +264,14 @@ class robot(object):
             time.sleep(5e-6)
         self.current_pos_xy = target_position
         
-    def move_robot_circular(self, start, end, center, radius, direction='cw', delay_stpr=10):
-
-        target_position = end
-        # linear_segments = self.bresenham_line(
-        #     self.current_pos_xy[0],
-        #     self.current_pos_xy[1],
-        #     target_position[0],
-        #     target_position[1],
-        # )
+    def move_robot_circular(self, command, x_targ, y_targ, i=None, j=None, r=None, delay_stpr=10):
         
-        linear_segments = self.circular_interpolation(start, end, center, radius, direction)
+        target_position =[x_targ, y_targ]
+        if i==0 and j==0: # It makes full circle, target position = start position
+            target_position = self.current_pos_xy
+        
+        
+        linear_segments = self.circular_interpolation(command, x_targ, y_targ, i, j, r)
         
         stpr_delay_segments = self.get_stpr_delay_segments(linear_segments, delay_stpr)
         linear_segments = [["START"]*len(self.actuator.motors)] + linear_segments + [["END"]*len(self.actuator.motors)]
