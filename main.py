@@ -38,10 +38,10 @@ def parse_gcode(gcode, prev_gcode_params={'cmd': None, 'x': None, 'y': None , 'i
 def execute_motion(robo, command, x, y, i, j, r, f):
     while robo.actuator.move_steppers_flag:
         time.sleep(0.02)
-    if command=='G01':
+    if command in ['G01', 'G1']:
         robo.move_robot_linear(x, y, delay_stpr=50)
     
-    elif command=='G02' or command=='G03':
+    elif command in ['G02', 'G2', 'G03', 'G3']:
         robo.move_robot_circular(command=command, x_targ=x, y_targ=y, i=i, j=j, r=r, delay_stpr=500)
     
         
@@ -69,31 +69,44 @@ if __name__ == "__main__":
     For local setup to initiate this, set the stepper motor pointer manually.
     press y to continue
     """
-    # while True:
-    #     start = str(input("Press y if links are initiated: "))
-    #     if start == "y":
-    #         break
-    #     else:
-    #         print("invalid input please provide proper input")
+    
+    process_gcode("G01 X0 Y100", robo)
+    while True:
+        start = str(input("Press y if links are initiated: "))
+        if start == "y":
+            break
+        else:
+            print("invalid input please provide proper input")
     
     
     
-    gcodes = [
-            "G01 X0 Y100",
-            "G01 X30 Y100",
-            "G02 X30 Y130 I0 J15",
-            # "G01 X30 Y130",
-            "G01 X-30 Y130",
-            "G01 X-30 Y100",
-            "G01 X0 Y100"
-            ]
+    # gcodes = [
+    #         "G01 X0 Y100",
+    #         "G01 X30 Y100",
+    #         "G02 X30 Y130 I0 J15",
+    #         # "G01 X30 Y130",
+    #         "G01 X-30 Y130",
+    #         "G01 X-30 Y100",
+    #         "G01 X0 Y100"
+    #         ]
+    
+    
+    # Read Gcodes from gcodes_text file and put them into a list    
+    gcode_file_path = r"utils/gcode_test_3_zigzag.txt"
+    gcodes_list = []
+    with open(gcode_file_path, 'r') as file:
+        # Iterate over each line in the file
+        for line in file:
+            if line.startswith('G1') or line.startswith('G01') or line.startswith('G02') or line.startswith('G03'):
+                gcodes_list.append(line.strip())
+    
     
     print("reprap start")
     
     robo.init_accel_value = 10000
     robo.accel_scale_factor = 1.005
     
-    for gcode in gcodes:
+    for gcode in gcodes_list:
         process_gcode(gcode, robo)
 
     

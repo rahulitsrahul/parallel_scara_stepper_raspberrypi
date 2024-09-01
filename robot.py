@@ -20,7 +20,7 @@ class robot(object):
         
         print("Initiating ROBOT")
         self.initiate_actuators()
-        self.current_pos_xy = [1, 146]
+        self.current_pos_xy = [3, 147]
         
         # Set init thetas as same as current pos
         x, y = self.current_pos_xy
@@ -138,12 +138,15 @@ class robot(object):
         # print(f"params: startx: {start_x}, start_y: {start_y}, cmd:{command}, x:{x}, y:{y}, i:{i}, j:{j}, r:{r}")
         full_circle_flag = False
         resolution=0.1
+        cw_list = ['G03', 'G3']
+        ccw_list = ['G02', 'G2']
     
         if r is not None:
             # Calculate the distance between start and end points
             dx = x - start_x
             dy = y - start_y
             d = math.sqrt(dx**2 + dy**2)
+            
     
             if d > 2 * abs(r):
                 raise ValueError("Distance between start and end points is greater than the diameter of the circle")
@@ -154,10 +157,10 @@ class robot(object):
             # Calculate the distance from the midpoint to the center of the circle
             h = math.sqrt(r**2 - (d/2)**2)
     
-            if command == 'G03':  # Clockwise
+            if command in ccw_list:  # Clockwise
                 xc = mx + h * dy / d
                 yc = my - h * dx / d
-            elif command == 'G02':  # Counterclockwise
+            elif command in cw_list:  # Counterclockwise
                 xc = mx - h * dy / d
                 yc = my + h * dx / d
     
@@ -184,16 +187,16 @@ class robot(object):
     
         if full_circle_flag:
             # Ensure a full circle is made
-            if command == 'G03':  # Clockwise
+            if command in ccw_list:  # Clockwise
                 end_angle = start_angle - 2 * math.pi
-            elif command == 'G02':  # Counterclockwise
+            elif command in cw_list:  # Counterclockwise
                 end_angle = start_angle + 2 * math.pi
         else:
             # Adjust the end angle based on the direction
-            if command == 'G03':  # Clockwise
+            if command in ccw_list:  # Clockwise
                 if end_angle > start_angle:
                     end_angle -= 2 * math.pi
-            elif command == 'G02':  # Counterclockwise
+            elif command in cw_list:  # Counterclockwise
                 if end_angle < start_angle:
                     end_angle += 2 * math.pi
     
